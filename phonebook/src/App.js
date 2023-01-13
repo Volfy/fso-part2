@@ -48,11 +48,11 @@ const App = () => {
   return (
     <div>
       <h1>Phonebook</h1>
-        <Filter 
-          nameFilter={nameFilter} 
-          setNameFilter={setNameFilter} 
-          handleChange={handleChange}
-        />
+      <Filter 
+        nameFilter={nameFilter} 
+        setNameFilter={setNameFilter} 
+        handleChange={handleChange}
+      />
       <h2>Add New Contact</h2>
       <PersonForm 
         persons={persons}
