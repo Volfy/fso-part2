@@ -18,10 +18,41 @@ const App = () => {
     passFn(event.target.value)
   }
 
+  const addPerson = (event) => {
+    event.preventDefault()
+
+    // some validation
+    if(!newName || !newNumber) {
+      alert('Missing Values')
+      return
+    }
+
+    // Duplicate Numbers should be fine.
+    // not validating inputs thoroughly
+
+    const isUnique = !persons.filter(p => p.name === newName).length 
+
+    if (isUnique){
+      const Person = {
+        name: newName,
+        number: newNumber,
+      }
+      setPersons(persons.concat(Person))
+      setNewName('')
+      setNewNumber('')
+    } else {
+      alert(`${newName} is already in the phonebook`)
+    }
+  }
+
   return (
     <div>
       <h1>Phonebook</h1>
-        <Filter nameFilter={nameFilter} setNameFilter={setNameFilter} handleChange={handleChange}/>
+        <Filter 
+          nameFilter={nameFilter} 
+          setNameFilter={setNameFilter} 
+          handleChange={handleChange}
+        />
       <h2>Add New Contact</h2>
       <PersonForm 
         persons={persons}
@@ -31,9 +62,13 @@ const App = () => {
         setNewNumber={setNewNumber}
         setPersons={setPersons}
         handleChange={handleChange}
+        addPerson={addPerson}
       />
       <h2>Contact List</h2>
-      <Persons persons={persons} nameFilter={nameFilter}/>
+      <Persons 
+        persons={persons} 
+        nameFilter={nameFilter}
+      />
     </div>
   )
 }
