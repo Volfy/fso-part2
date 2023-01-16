@@ -1,11 +1,39 @@
 import {useEffect, useState} from 'react'
 import axios from 'axios'
 
+const api_key = process.env.REACT_APP_API_KEY
+
 const Filter = ({nameFilter, handleChange}) => 
 <form>
   find country:&nbsp;
     <input value={nameFilter} onChange={handleChange}/>
 </form>
+
+const Weather = ({capital}) => {
+  // unsure if this is good practice 
+  const [weather, setWeather] = useState([])
+  useEffect(() => {
+    axios
+      .get(`http://api.openweathermap.org/data/2.5/weather?q=${capital}&appid=${api_key}`)
+      .then(response => {
+        const x = {
+        wind: response.data.wind.speed.toFixed(2),
+        temp: (response.data.main.temp - 273.15).toFixed(2),
+        icon: `http://openweathermap.org/img/wn/${response.data.weather[0].icon}@2x.png`,
+        alt: response.data.weather[0].description
+      }
+      setWeather(x)
+    })
+  }, [])
+
+  return (
+    <div>
+      <h2>Weather in {capital}</h2>
+      <div>temperature {weather.temp} Celsius</div>
+      <img src={weather.icon} alt={weather.alt} />
+      <div>wind {weather.wind} m/s</div>
+    </div>)
+}
 
 const FullCountry = ({name, area, capital, flag, languages}) => (
   <div>
@@ -19,6 +47,7 @@ const FullCountry = ({name, area, capital, flag, languages}) => (
       </ul> 
     </div>
     <img src={flag} alt="flag" />
+    <Weather capital={capital} />
   </div>
 )
 
@@ -78,6 +107,7 @@ function App() {
   }
 
   // not ideal but it works....
+  // will never show eg. Sudan. 
   const handleShow = (event) => {
     setNameFilter(event.target.getAttribute('country'))
   }
