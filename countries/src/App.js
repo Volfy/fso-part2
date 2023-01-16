@@ -16,7 +16,6 @@ const FullCountry = ({name, area, capital, flag, languages}) => (
       <h3>languages:</h3>
       <ul>
         {Object.values(languages).map(x => <li key={x}>{x}</li>)}
-        
       </ul> 
     </div>
     <img src={flag} alt="flag" />
@@ -31,8 +30,9 @@ const CollapseCountry = ({name, handleShow}) => (
 )
 
 const Countries = ({matches, handleShow}) => {
-  
-  if (matches.length === 1) {
+  if (matches.length === 0) {return <div>No Matches</div>}
+  else if (matches.length > 10) {return <div>Too Many Matches</div>}
+  else if (matches.length === 1) {
     return <FullCountry 
       key={matches[0].name}
       name={matches[0].name} 
@@ -41,10 +41,10 @@ const Countries = ({matches, handleShow}) => {
       languages={matches[0].languages}
       flag={matches[0].flag}
     />
-  } else if (matches.length === 0) {return <div>No Matches</div>}
-  else if (matches.length > 10) {return <div>Too Many Matches</div>}
-  else {
-    return matches.map(x => <CollapseCountry key={x.name} name={x.name} handleShow={handleShow}/>)
+  } else {
+    return matches.map(x => 
+      <CollapseCountry key={x.name} name={x.name} handleShow={handleShow}/>
+    )
   }
 }
 
@@ -77,6 +77,7 @@ function App() {
     setNameFilter(event.target.value)
   }
 
+  // not ideal but it works....
   const handleShow = (event) => {
     setNameFilter(event.target.getAttribute('country'))
   }
