@@ -30,6 +30,18 @@ const App = () => {
           })
           setTimeout(() => setNotifMessage({message: null, isError: false}), 2000)
         })
+        .catch(error => {
+          phServ
+            .getAll()
+            .then(data => setPersons(data))
+          setNewName('')
+          setNewNumber('')
+          setNotifMessage({
+            message: `${name} already deleted from server`,
+            isError: true
+          })
+          setTimeout(() => setNotifMessage({message: null, isError: false}), 4000)
+        })
     }
   }
 
@@ -49,6 +61,10 @@ const App = () => {
     }
 
     // Duplicate Numbers should be fine.
+    // will add duplicate names in case one browser adds
+    // a new name and the other also adds before the prior updates.
+    // the check if unique is ONLY in the frontend.
+    // running setPersons() in getAll() again doesn't change anything
     const isUnique = !persons.filter(p => p.name.toLowerCase() === newName.toLowerCase()).length 
 
     const Person = {
@@ -68,7 +84,7 @@ const App = () => {
             message: `Added ${newName}`,
             isError: false
           })
-          setTimeout(() => setNotifMessage({message: null, isError: false}), 2000)
+          setTimeout(() => setNotifMessage({message: null, isError: false}), 4000)
         })  
     } else {
       const oldPerson = persons.filter(p => p.name.toLowerCase() === newName.toLowerCase())[0]
@@ -87,7 +103,17 @@ Replace the old number with the new one?`)) {
               message: `Updated ${newName}`,
               isError: false
             })
-            setTimeout(() => setNotifMessage({message: null, isError: false}), 2000)
+            setTimeout(() => setNotifMessage({message: null, isError: false}), 4000)
+          })
+          .catch(error => {
+            phServ
+            .getAll()
+            .then(data => setPersons(data))
+            setNotifMessage({
+            message: `${newName} cannot be updated, has been deleted from server`,
+            isError: true
+          })
+          setTimeout(() => setNotifMessage({message: null, isError: false}), 4000)
           })
       }
     }
