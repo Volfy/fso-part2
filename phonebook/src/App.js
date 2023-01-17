@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+import phServ from './services/phones'
 import PersonForm from './components/PersonForm'
 import Filter from './components/Filter'
 import Persons from './components/Persons'
@@ -14,11 +14,10 @@ const App = () => {
   }
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        setPersons(response.data)
-      })
+    //backend */
+    phServ
+      .getAll()
+      .then(data => setPersons(data))
   }, [])
 
   const addPerson = (event) => {
@@ -40,9 +39,14 @@ const App = () => {
         name: newName,
         number: newNumber,
       }
-      setPersons(persons.concat(Person))
-      setNewName('')
-      setNewNumber('')
+
+      phServ
+        .addNew(Person)
+        .then(data => {
+          setPersons(persons.concat(data))
+          setNewName('')
+          setNewNumber('')
+        })  
     } else {
       alert(`${newName} is already in the phonebook`)
     }
