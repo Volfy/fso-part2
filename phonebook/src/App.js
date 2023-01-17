@@ -9,12 +9,23 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [nameFilter, setNameFilter] = useState('')
-  const handleChange = (event, passFn) => {
-    passFn(event.target.value)
+  const handleChange = (event, setFn) => {
+    setFn(event.target.value)
+  }
+  const handleDelete = event => {
+    if(window.confirm(`Are you sure you want to delete ${event.target.getAttribute('name')}?`)) {
+      const id = event.target.getAttribute('id')
+      phServ
+        .remove(id)
+        .then(r => {
+          setPersons(persons.filter(p => p.id != id))
+          setNewName('')
+          setNewNumber('')
+        })
+    }
   }
 
   useEffect(() => {
-    //backend */
     phServ
       .getAll()
       .then(data => setPersons(data))
@@ -30,15 +41,14 @@ const App = () => {
     }
 
     // Duplicate Numbers should be fine.
-    // not validating inputs thoroughly
+    const isUnique = !persons.filter(p => p.name.toLowerCase() === newName.toLowerCase()).length 
 
-    const isUnique = !persons.filter(p => p.name === newName).length 
+    const Person = {
+      name: newName,
+      number: newNumber,
+    }
 
     if (isUnique){
-      const Person = {
-        name: newName,
-        number: newNumber,
-      }
 
       phServ
         .addNew(Person)
@@ -48,7 +58,20 @@ const App = () => {
           setNewNumber('')
         })  
     } else {
-      alert(`${newName} is already in the phonebook`)
+      const oldPerson = persons.filter(p => p.name.toLowerCase() === newName.toLowerCase())[0]
+      // using the old name means case changes won't update. 
+      Person.name = oldPerson.name
+      const id = oldPerson.id
+      if (window.confirm(`${Person.name} is already in the phonebook. 
+Replace the old number with the new one?`)) {
+        phServ
+          .update(id, Person)
+          .then(data => {
+            setPersons(persons.map(p => p.id != id ? p : data))
+            setNewName('')
+            setNewNumber('')
+          })
+      }
     }
   }
 
@@ -75,6 +98,7 @@ const App = () => {
       <Persons 
         persons={persons} 
         nameFilter={nameFilter}
+        delFn={handleDelete}
       />
     </div>
   )
